@@ -72,8 +72,10 @@ def all_track_info_provided():
         if not all([track['bpm'], track['key'], track['meter'], track['instrumentation']]):
             return False
     return True
+    
 def send_email_with_excel(recipient_email, file_path):
-   # Try to get the API key from secrets
+    try:
+        # Try to get the API key from secrets
         sendgrid_secrets = st.secrets.get("sendgrid", {})
         api_key = sendgrid_secrets.get("sendgrid_api_key")  # Changed from "api_key" to "sendgrid_api_key"
         
@@ -123,7 +125,6 @@ def send_email_with_excel(recipient_email, file_path):
         if isinstance(e, sendgrid.SendGridException):
             st.error(f"SendGrid error details: {e.body}")
         return False
-
 
 # Add this near the top of your app, after the imports
 st.write("Available secrets:", list(st.secrets.keys()))
