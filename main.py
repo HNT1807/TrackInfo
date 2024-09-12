@@ -75,7 +75,8 @@ def all_track_info_provided():
 def send_email_with_excel(recipient_email, file_path):
     try:
         # Try to get the API key from secrets
-        api_key = st.secrets.get("sendgrid_api_key")
+        sendgrid_secrets = st.secrets.get("sendgrid", {})
+        api_key = sendgrid_secrets.get("api_key")
         
         if not api_key:
             st.error("SendGrid API key not found in secrets. Please check your configuration.")
@@ -121,17 +122,11 @@ def send_email_with_excel(recipient_email, file_path):
         st.error(f"Error sending email: {str(e)}")
         return False
 
-# In your main app code:
-if all_track_info_provided():
-    if st.button("𝗦𝗨𝗕𝗠𝗜𝗧"):
-        file_path = generate_excel_file()
-        if send_email_with_excel("nicolas.techer@warnerchappellpm.com", file_path):
-            st.success("Submission complete")
-        else:
-            st.error("Failed to send email. Please check the error messages above.")
 
 # Add this near the top of your app, after the imports
 st.write("Available secrets:", list(st.secrets.keys()))
+if "sendgrid" in st.secrets:
+    st.write("SendGrid secret keys:", list(st.secrets.sendgrid.keys()))
 
 
 # Main app layout
