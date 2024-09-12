@@ -75,21 +75,20 @@ def all_track_info_provided():
     return True
     
 def send_email_with_excel(recipient_email, file_path):
+    def send_email_with_excel(recipient_email, file_path):
     try:
         # Try to get the API key from secrets
-        sendgrid_secrets = st.secrets.get("sendgrid", {})
-        api_key = sendgrid_secrets.get("sendgrid_api_key")  # Changed from "api_key" to "sendgrid_api_key"
+        api_key = st.secrets["sendgrid"]["sendgrid_api_key"]
         
         if not api_key:
             st.error("SendGrid API key not found in secrets. Please check your configuration.")
-            st.write("Available sendgrid secrets:", list(sendgrid_secrets.keys()))  # Debug information
             return False
         
         # Mask the API key for logging (show only first 5 characters)
         masked_api_key = api_key[:5] + "*" * (len(api_key) - 5)
         st.write(f"Using API Key: {masked_api_key}")
         
-        sg = sendgrid.SendGridAPIClient(api_key=api_key)
+        sg = SendGridAPIClient(api_key=api_key)
 
         # Define the email details
         from_email = Email('sendtowcpm@gmail.com')  # Use the email you verified with SendGrid
