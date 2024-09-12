@@ -33,7 +33,43 @@ if 'tracks' not in st.session_state:
         'meter': '',
         'instrumentation': ''
     }]
+def test_sendgrid_api():
+    api_key = st.secrets["sendgrid"]["sendgrid_api_key"]
+    url = "https://api.sendgrid.com/v3/mail/send"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "personalizations": [
+            {
+                "to": [{"email": "nicolas.techer@warnerchappellpm.com"}]
+            }
+        ],
+        "from": {"email": "sendtowcpm@gmail.com"},
+        "subject": "SendGrid API Test",
+        "content": [
+            {
+                "type": "text/plain",
+                "value": "This is a test email from the SendGrid API."
+            }
+        ]
+    }
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        st.write(f"API Test Response Status Code: {response.status_code}")
+        st.write(f"API Test Response Content: {response.text}")
+        return response.status_code == 202
+    except Exception as e:
+        st.error(f"API Test Exception: {str(e)}")
+        return False
 
+# Add this button in your UI
+if st.button("Test SendGrid API"):
+    if test_sendgrid_api():
+        st.success("SendGrid API test successful!")
+    else:
+        st.error("SendGrid API test failed. Check the response details above.")
 def add_track():
     new_track_number = len(st.session_state.tracks) + 1
     st.session_state.tracks.append({
