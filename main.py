@@ -121,10 +121,12 @@ def send_email_with_excel(recipient_email, file_path):
         return True
 
     except Exception as e:
-        st.error(f"Error sending email: {str(e)}")
-        if isinstance(e, sendgrid.SendGridException):
-            st.error(f"SendGrid error details: {e.body}")
-        return False
+    st.error(f"Error sending email: {str(e)}")
+    if isinstance(e, sendgrid.SendGridException):
+        st.error(f"SendGrid error details: {e.body}")
+    elif isinstance(e, requests.exceptions.RequestException):
+        st.error(f"Request error details: {e.response.text if e.response else 'No response'}")
+    return False
 
 # Add this near the top of your app, after the imports
 st.write("Available secrets:", list(st.secrets.keys()))
