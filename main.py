@@ -74,8 +74,7 @@ def all_track_info_provided():
     return True
 def send_email_with_excel(recipient_email, file_path):
     # Replace with your SendGrid API key
-    sg = sendgrid.SendGridAPIClient(api_key=st.secrets["sendgrid"]["api_key"])
-
+    sg = sendgrid.SendGridAPIClient(api_key=st.secrets["sendgrid_api_key"])
     # Define the email details
     from_email = Email('sendtowcpm@gmail.com')  # Use the email you verified with SendGrid
     to_email = To(recipient_email)
