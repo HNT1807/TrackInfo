@@ -43,7 +43,7 @@ def add_track():
         'meter': '',
         'instrumentation': ''
     })
-    st.rerun()
+
 
 def delete_track(track_id):
     st.session_state.tracks = [track for track in st.session_state.tracks if track['id'] != track_id]
