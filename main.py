@@ -73,39 +73,65 @@ def all_track_info_provided():
             return False
     return True
 def send_email_with_excel(recipient_email, file_path):
-    # Replace with your SendGrid API key
-    sg = sendgrid.SendGridAPIClient(api_key=st.secrets["sendgrid_api_key"])
-    # Define the email details
-    from_email = Email('sendtowcpm@gmail.com')  # Use the email you verified with SendGrid
-    to_email = To(recipient_email)
-    subject = 'WCPM Track Information'
-    content = Content('text/plain', 'Please find the attached Excel file with track information.')
-
-    # Create the mail object
-    mail = Mail(from_email, to_email, subject, content)
-
-    # Read and encode the file
-    with open(file_path, "rb") as attachment_file:
-        file_data = attachment_file.read()
-        encoded_file = base64.b64encode(file_data).decode()
-
-    # Create the attachment
-    attachment = Attachment(
-        FileContent(encoded_file),
-        FileName(os.path.basename(file_path)),
-        FileType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
-        Disposition('attachment')
-    )
-
-    # Add the attachment to the mail
-    mail.add_attachment(attachment)
-
-    # Send the email
     try:
+        # Try to get the API key from secrets
+        api_key = st.secrets.get("sendgrid_api_key")
+        
+        if not api_key:
+            st.error("SendGrid API key not found in secrets. Please check your configuration.")
+            return False
+        
+        # Mask the API key for logging (show only first 5 characters)
+        masked_api_key = api_key[:5] + "*" * (len(api_key) - 5)
+        st.write(f"Using API Key: {masked_api_key}")
+        
+        sg = sendgrid.SendGridAPIClient(api_key=api_key)
+
+        # Define the email details
+        from_email = Email('sendtowcpm@gmail.com')  # Use the email you verified with SendGrid
+        to_email = To(recipient_email)
+        subject = 'WCPM Track Information'
+        content = Content('text/plain', 'Please find the attached Excel file with track information.')
+
+        # Create the mail object
+        mail = Mail(from_email, to_email, subject, content)
+
+        # Read and encode the file
+        with open(file_path, "rb") as attachment_file:
+            file_data = attachment_file.read()
+            encoded_file = base64.b64encode(file_data).decode()
+
+        # Create the attachment
+        attachment = Attachment(
+            FileContent(encoded_file),
+            FileName(os.path.basename(file_path)),
+            FileType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),
+            Disposition('attachment')
+        )
+
+        # Add the attachment to the mail
+        mail.add_attachment(attachment)
+
+        # Send the email
         response = sg.send(mail)
-        print(f"Email sent with status code: {response.status_code}")
+        st.write(f"Email sent with status code: {response.status_code}")
+        return True
+
     except Exception as e:
-        print(f"Error sending email: {e}")
+        st.error(f"Error sending email: {str(e)}")
+        return False
+
+# In your main app code:
+if all_track_info_provided():
+    if st.button("𝗦𝗨𝗕𝗠𝗜𝗧"):
+        file_path = generate_excel_file()
+        if send_email_with_excel("nicolas.techer@warnerchappellpm.com", file_path):
+            st.success("Submission complete")
+        else:
+            st.error("Failed to send email. Please check the error messages above.")
+
+# Add this near the top of your app, after the imports
+st.write("Available secrets:", list(st.secrets.keys()))
 
 
 # Main app layout
