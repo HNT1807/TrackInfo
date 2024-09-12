@@ -120,6 +120,8 @@ def send_email_with_excel(recipient_email, file_path):
 
     except Exception as e:
         st.error(f"Error sending email: {str(e)}")
+        if isinstance(e, sendgrid.SendGridException):
+            st.error(f"SendGrid error details: {e.body}")
         return False
 
 
@@ -127,6 +129,12 @@ def send_email_with_excel(recipient_email, file_path):
 st.write("Available secrets:", list(st.secrets.keys()))
 if "sendgrid" in st.secrets:
     st.write("SendGrid secret keys:", list(st.secrets.sendgrid.keys()))
+else:
+    st.error("SendGrid secrets not found. Please check your Streamlit secrets configuration.")
+
+# Print the current working directory and list its contents
+st.write("Current working directory:", os.getcwd())
+st.write("Contents of current directory:", os.listdir())
 
 
 # Main app layout
@@ -211,11 +219,15 @@ with center_col:
 
     # Submit button
 
-    if all_track_info_provided():
-        if st.button("𝗦𝗨𝗕𝗠𝗜𝗧"):
-            file_path = generate_excel_file()
-            send_email_with_excel("nicolas.techer@warnerchappellpm.com", file_path)
+    # Submit button
+submit_button_key = "submit_button"  # Unique key for the submit button
+if all_track_info_provided():
+    if st.button("𝗦𝗨𝗕𝗠𝗜𝗧", key=submit_button_key):
+        file_path = generate_excel_file()
+        if send_email_with_excel("nicolas.techer@warnerchappellpm.com", file_path):
             st.success("Submission complete")
-    else:
-        st.button("𝗦𝗨𝗕𝗠𝗜𝗧", disabled=True)
-        st.warning("You must provide all track info to be able to submit this form.")
+        else:
+            st.error("Failed to send email. Please check the error messages above.")
+else:
+    st.button("𝗦𝗨𝗕𝗠𝗜𝗧", key=submit_button_key, disabled=True)
+    st.warning("You must provide all track info to be able to submit this form.")
