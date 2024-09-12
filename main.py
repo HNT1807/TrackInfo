@@ -73,13 +73,13 @@ def all_track_info_provided():
             return False
     return True
 def send_email_with_excel(recipient_email, file_path):
-    try:
-        # Try to get the API key from secrets
+   # Try to get the API key from secrets
         sendgrid_secrets = st.secrets.get("sendgrid", {})
-        api_key = sendgrid_secrets.get("api_key")
+        api_key = sendgrid_secrets.get("sendgrid_api_key")  # Changed from "api_key" to "sendgrid_api_key"
         
         if not api_key:
             st.error("SendGrid API key not found in secrets. Please check your configuration.")
+            st.write("Available sendgrid secrets:", list(sendgrid_secrets.keys()))  # Debug information
             return False
         
         # Mask the API key for logging (show only first 5 characters)
@@ -129,6 +129,10 @@ def send_email_with_excel(recipient_email, file_path):
 st.write("Available secrets:", list(st.secrets.keys()))
 if "sendgrid" in st.secrets:
     st.write("SendGrid secret keys:", list(st.secrets.sendgrid.keys()))
+    if "sendgrid_api_key" in st.secrets.sendgrid:
+        st.write("SendGrid API key is properly configured.")
+    else:
+        st.error("SendGrid API key is missing from the secrets.")
 else:
     st.error("SendGrid secrets not found. Please check your Streamlit secrets configuration.")
 
