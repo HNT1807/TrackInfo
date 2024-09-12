@@ -92,7 +92,7 @@ def send_email_with_excel(recipient_email, file_path):
 
         # Define the email details
         from_email = Email('sendtowcpm@gmail.com')  # Use the email you verified with SendGrid
-        to_email = To(recipient_email)
+        to_email = To('nicolas.techer@warnerchappellpm.com')
         subject = 'WCPM Track Information'
         content = Content('text/plain', 'Please find the attached Excel file with track information.')
 
